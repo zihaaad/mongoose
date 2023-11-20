@@ -21,6 +21,7 @@ export type UserName = {
 };
 
 export type Student = {
+  id: string;
   name: UserName;
   gender: "male" | "female";
   dateOfBirth?: string;
