@@ -1,7 +1,5 @@
 import Joi from "joi";
 
-// creating a schema validation using Joi
-
 const userNameSchema = Joi.object({
   firstName: Joi.string()
     .required()
