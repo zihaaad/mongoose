@@ -4,10 +4,12 @@ import {
   TGaurdian,
   TLocalGuardian,
   TStudent,
-  StudentMethods,
   StudentModel,
   TUserName,
 } from "./student.interface";
+
+import bcrypt from "bcrypt";
+import config from "../../config";
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -65,6 +67,7 @@ const localGuardian = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>({
   id: {type: String, require: true, unique: true},
+  password: {type: String, required: true},
   name: {
     type: userNameSchema,
     required: true,
@@ -116,6 +119,22 @@ const studentSchema = new Schema<TStudent, StudentModel>({
       enum: ["active", "blocked"],
     },
   },
+});
+
+// pre save middleware / hook: will work on create() save()
+studentSchema.pre("save", async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+  next();
+});
+
+studentSchema.post("save", function () {
+  console.log(this, "post hook called");
 });
 
 // creating a custom static method
