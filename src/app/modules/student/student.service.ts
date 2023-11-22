@@ -25,12 +25,13 @@ const getAllStudents = async () => {
 };
 
 const getSingleStudent = async (id: string) => {
-  const result = await Student.findById(id);
+  // const result = await Student.findById(id);
+  const result = await Student.aggregate([{$match: {id: id}}]);
   return result;
 };
 
 const updateStudent = async (id: string, student: TStudent) => {
-  const result = await Student.findByIdAndUpdate(id, student, {
+  const result = await Student.updateOne({id}, student, {
     new: true,
     runValidators: true,
   });
@@ -38,7 +39,7 @@ const updateStudent = async (id: string, student: TStudent) => {
 };
 
 const deleteStudent = async (id: string) => {
-  const result = await Student.findByIdAndDelete(id);
+  const result = await Student.updateOne({id}, {isDeleted: true});
   return result;
 };
 

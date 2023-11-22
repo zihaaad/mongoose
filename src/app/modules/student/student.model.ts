@@ -1,4 +1,4 @@
-import {Schema, model} from "mongoose";
+import mongoose, {Schema, model} from "mongoose";
 // import validator from "validator";
 import {
   TGaurdian,
@@ -65,60 +65,78 @@ const localGuardian = new Schema<TLocalGuardian>({
   address: {type: String, required: [true, "Address Name is Required"]},
 });
 
-const studentSchema = new Schema<TStudent, StudentModel>({
-  id: {type: String, require: true, unique: true},
-  password: {type: String, required: true},
-  name: {
-    type: userNameSchema,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ["male", "female", "other"],
-      message: "{VALUE} is not valid",
-    },
-    required: true,
-  },
-  dateOfBirth: String,
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    // validate: {
-    //   validator: (value: string) => validator.isEmail(value),
-    //   message: "{VALUE} is not a valid email type",
-    // },
-  },
-  contactNo: {
-    type: String,
-    required: [true, "Contact No field is required"],
-  },
-  emergencyContactNo: {
-    type: String,
-    required: [true, "Emergency Contact No field is required"],
-  },
-  bloodGroup: {
-    type: String,
-    enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-  },
-  presentAddress: {type: String, required: [true, "Present field is required"]},
-  permanentAddress: {
-    type: String,
-    required: [true, "Permanent field is required"],
-  },
-  guardian: {
-    type: guardianSchema,
-    localGuardian: {
-      type: localGuardian,
+const studentSchema = new Schema<TStudent, StudentModel>(
+  {
+    id: {type: String, require: true, unique: true},
+    password: {type: String, required: true},
+    name: {
+      type: userNameSchema,
       required: true,
     },
-    profileImg: String,
-    isActive: {
+    gender: {
       type: String,
-      enum: ["active", "blocked"],
+      enum: {
+        values: ["male", "female", "other"],
+        message: "{VALUE} is not valid",
+      },
+      required: true,
+    },
+    dateOfBirth: String,
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      // validate: {
+      //   validator: (value: string) => validator.isEmail(value),
+      //   message: "{VALUE} is not a valid email type",
+      // },
+    },
+    contactNo: {
+      type: String,
+      required: [true, "Contact No field is required"],
+    },
+    emergencyContactNo: {
+      type: String,
+      required: [true, "Emergency Contact No field is required"],
+    },
+    bloodGroup: {
+      type: String,
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    },
+    presentAddress: {
+      type: String,
+      required: [true, "Present field is required"],
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, "Permanent field is required"],
+    },
+    guardian: {
+      type: guardianSchema,
+      localGuardian: {
+        type: localGuardian,
+        required: true,
+      },
+      profileImg: String,
+      isActive: {
+        type: String,
+        enum: ["active", "blocked"],
+      },
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
+  {
+    toJSON: {virtuals: true},
+  }
+);
+
+// virtual
+
+studentSchema.virtual("fullName").get(function () {
+  return `${this.name.firstName} ${this.name.lastName}`;
 });
 
 // pre save middleware / hook: will work on create() save()
@@ -133,8 +151,25 @@ studentSchema.pre("save", async function (next) {
   next();
 });
 
-studentSchema.post("save", function () {
-  console.log(this, "post hook called");
+studentSchema.post("save", function (doc, next) {
+  doc.password = "";
+  next();
+});
+
+// Query Middleware
+studentSchema.pre("find", function (next) {
+  this.find({isDeleted: {$ne: true}});
+  next();
+});
+
+studentSchema.pre("findOne", function (next) {
+  this.find({isDeleted: {$ne: true}});
+  next();
+});
+
+studentSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({$match: {isDeleted: {$ne: true}}});
+  next();
 });
 
 // creating a custom static method
