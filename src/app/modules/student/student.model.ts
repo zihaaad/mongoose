@@ -1,4 +1,4 @@
-import mongoose, {Schema, model} from "mongoose";
+import {Schema, model} from "mongoose";
 // import validator from "validator";
 import {
   TGaurdian,
@@ -14,26 +14,12 @@ import config from "../../config";
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
-    // required: [true, "First Name is Required"],
-    // trim: true,
-    // maxlength: [20, "Can't be more than 20"],
-    // validate: {
-    //   validator: function (value: string) {
-    //     const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
-    //     return firstNameStr === value;
-    //   },
-    //   message: "{VALUE} is not in capitalize format",
-    // },
   },
   middleName: String,
   lastName: {
     type: String,
     trim: true,
     required: true,
-    // validate: {
-    //   validator: (value: string) => validator.isAlpha(value),
-    // },
-    // message: "{VALUE} is not valid",
   },
 });
 
@@ -86,10 +72,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: String,
       required: true,
       unique: true,
-      // validate: {
-      //   validator: (value: string) => validator.isEmail(value),
-      //   message: "{VALUE} is not a valid email type",
-      // },
     },
     contactNo: {
       type: String,
@@ -171,8 +153,6 @@ studentSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({$match: {isDeleted: {$ne: true}}});
   next();
 });
-
-// creating a custom static method
 
 studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({id});
