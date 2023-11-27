@@ -53,7 +53,13 @@ const localGuardian = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>(
   {
-    id: {type: String, require: true, unique: true},
+    id: {type: String, required: true, unique: true},
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, "ID is required"],
+      unique: true,
+      ref: "User",
+    },
     password: {type: String, required: true},
     name: {
       type: userNameSchema,
@@ -100,10 +106,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
         required: true,
       },
       profileImg: String,
-      isActive: {
-        type: String,
-        enum: ["active", "blocked"],
-      },
     },
     isDeleted: {
       type: Boolean,
