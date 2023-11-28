@@ -1,11 +1,14 @@
 import {NextFunction, Request, Response} from "express";
 import {StudentServices} from "./student.service";
+import sendResponse from "../../utils/sendResponse";
+import httpStatus from "http-status";
 
 const getStudents = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await StudentServices.getAllStudents();
-    res.status(200).json({
+    sendResponse(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "students are retrieved successfully",
       data: result,
     });
@@ -22,9 +25,10 @@ const getSingleStudent = async (
   try {
     const id = req.params.id;
     const result = await StudentServices.getSingleStudent(id);
-    res.status(200).json({
+    sendResponse(res, {
       success: true,
-      message: "student is retrieved successfully",
+      statusCode: httpStatus.OK,
+      message: "Student is retrieved successfully",
       data: result,
     });
   } catch (error) {
@@ -41,9 +45,10 @@ const updateStudent = async (
     const id = req.params.id;
     const student = req.body;
     const result = await StudentServices.updateStudent(id, student);
-    res.status(200).json({
+    sendResponse(res, {
       success: true,
-      message: "student updated successfully",
+      statusCode: httpStatus.OK,
+      message: "Student updated successfully",
       data: result,
     });
   } catch (error) {
@@ -59,9 +64,10 @@ const deleteStudent = async (
   try {
     const id = req.params.id;
     const result = await StudentServices.deleteStudent(id);
-    res.status(200).json({
+    sendResponse(res, {
       success: true,
-      message: "student deleted successfully",
+      statusCode: httpStatus.OK,
+      message: "Student deleted successfully",
       data: result,
     });
   } catch (error) {
