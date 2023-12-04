@@ -21,8 +21,20 @@ const getSingleAcademicSemester = async (id: string) => {
   return result;
 };
 
+const updateAcademicSemester = async (
+  id: string,
+  updatedData: Partial<TAcademicSemester>
+) => {
+  const result = await AcademicSemester.findByIdAndUpdate(id, updatedData, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 export const AcademicSemesterServices = {
   createAcademicSemster,
+  updateAcademicSemester,
   getAllAcademicSemesters,
   getSingleAcademicSemester,
 };
