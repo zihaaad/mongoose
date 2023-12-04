@@ -11,6 +11,12 @@ const createAcademicSemster = async (payload: TAcademicSemester) => {
   return result;
 };
 
+const getAllAcademicSemesters = async () => {
+  const result = await AcademicSemester.find();
+  return result;
+};
+
 export const AcademicSemesterServices = {
   createAcademicSemster,
+  getAllAcademicSemesters,
 };
