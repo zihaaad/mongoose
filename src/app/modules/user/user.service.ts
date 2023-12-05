@@ -1,8 +1,10 @@
 import config from "../../config";
+import {AcademicSemester} from "../academicSemester/academicSemester.model";
 import {TStudent} from "../student/student.interface";
 import {Student} from "../student/student.model";
 import {TUser} from "./user.interface";
 import {User} from "./user.model";
+import {generateStudentId} from "./user.utils";
 
 const createStudent = async (password: string, studentData: TStudent) => {
   //   if (await Student.isUserExists(studentData.id)) {
@@ -15,11 +17,13 @@ const createStudent = async (password: string, studentData: TStudent) => {
   // if password is not given, use default password
   userData.password = password || (config.default_password as string);
 
-  // set student role
   userData.role = "student";
 
-  // set manually generated it
-  userData.id = "2030100001";
+  const admissionSemester = await AcademicSemester.findById(
+    studentData.admissionSemester
+  );
+
+  userData.id = await generateStudentId(admissionSemester);
 
   // create a user
   const newUser = await User.create(userData);

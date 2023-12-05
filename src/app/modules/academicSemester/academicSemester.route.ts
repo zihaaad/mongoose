@@ -11,7 +11,16 @@ router.post(
   AcamedicSemesterControllers.createAcademicSemster
 );
 router.get("/", AcamedicSemesterControllers.getAllAcademicSemesters);
-router.get("/:id", AcamedicSemesterControllers.getSingleAcademicSemester);
-router.patch("/:id", AcamedicSemesterControllers.updateAcademicSemester);
+router.get(
+  "/:semesterId",
+  AcamedicSemesterControllers.getSingleAcademicSemester
+);
+router.patch(
+  "/:semesterId",
+  validateRequest(
+    AcademicSemisterValidations.updateAcademicSemesterValidationSchema
+  ),
+  AcamedicSemesterControllers.updateAcademicSemester
+);
 
 export const AcademicSemesterRoutes = router;
