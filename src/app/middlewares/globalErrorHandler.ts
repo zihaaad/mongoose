@@ -13,7 +13,7 @@ export const globalErrorHandler = (
 ) => {
   let message = err.message || "Something went wrong!";
 
-  return res.status(500).json({
+  return res.status(err.statusCode || 500).json({
     success: false,
     message,
     error: err,
