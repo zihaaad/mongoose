@@ -13,7 +13,7 @@ const createAcademicFaculty = catchAsync(async (req, res) => {
 });
 
 const getAllAcademicFaculies = catchAsync(async (req, res) => {
-  const result = academicFacultyServices.getAllAcademicFaculies();
+  const result = await academicFacultyServices.getAllAcademicFaculies();
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: "Academic Faculties Retrieved Successfully",

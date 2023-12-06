@@ -1,15 +1,21 @@
 import {z} from "zod";
 
 const academicFacultyValidationSchema = z.object({
-  name: z.string({
-    invalid_type_error: "academic faculty must be stirng",
+  body: z.object({
+    name: z.string({
+      invalid_type_error: "academic faculty must be stirng",
+    }),
   }),
 });
 
 const updateAcademicFacultyValidationSchema = z.object({
-  name: z.string({
-    invalid_type_error: "academic faculty must be stirng",
-  }),
+  body: z
+    .object({
+      name: z.string({
+        invalid_type_error: "academic faculty must be stirng",
+      }),
+    })
+    .optional(),
 });
 
 export const AcademicFacultyValidation = {
