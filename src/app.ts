@@ -17,7 +17,7 @@ const server = (req: Request, res: Response) => {
 };
 
 app.get("/", server);
-app.use(globalErrorHandler);
 app.use(notFound);
+app.use(globalErrorHandler);
 
 export default app;
