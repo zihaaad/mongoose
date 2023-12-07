@@ -15,16 +15,16 @@ const academicDepartmentSchema = new Schema<TAcademicDepartment>(
   {timestamps: true}
 );
 
-academicDepartmentSchema.pre("save", async function (next) {
-  const isDepartmentExist = await AcademicDepartment.findOne({name: this.name});
-  if (isDepartmentExist) {
-    throw new AppError(
-      httpStatus.NOT_ACCEPTABLE,
-      "This Department is already exist!"
-    );
-  }
-  next();
-});
+// academicDepartmentSchema.pre("save", async function (next) {
+//   const isDepartmentExist = await AcademicDepartment.findOne({name: this.name});
+//   if (isDepartmentExist) {
+//     throw new AppError(
+//       httpStatus.NOT_ACCEPTABLE,
+//       "This Department is already exist!"
+//     );
+//   }
+//   next();
+// });
 
 academicDepartmentSchema.pre("findOneAndUpdate", async function (next) {
   const query = this.getQuery();
