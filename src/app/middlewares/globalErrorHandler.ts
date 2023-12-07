@@ -1,21 +1,57 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-const */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {NextFunction, Request, Response} from "express";
+import {ErrorRequestHandler} from "express";
+import {ZodError, ZodIssue} from "zod";
+import {TErrorDoc} from "../interfaces/error";
+import config from "../config";
 
-export const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
+export const globalErrorHandler: ErrorRequestHandler = (
+  err,
+  req,
+  res,
+  next
 ) => {
+  let statusCode = err.statusCode || 500;
   let message = err.message || "Something went wrong!";
 
-  return res.status(err.statusCode || 500).json({
+  let errorDocs: TErrorDoc = [
+    {
+      path: "",
+      message: "Something went Wrong",
+    },
+  ];
+
+  const hanldeZodError = (err: ZodError) => {
+    const statusCode = 400;
+
+    const errorDocs = err.issues.map((issue: ZodIssue) => {
+      return {
+        path: issue?.path[issue.path.length - 1],
+        message: issue?.message,
+      };
+    });
+
+    return {
+      statusCode,
+      message: "Validation Error",
+      errorDocs,
+    };
+  };
+
+  if (err instanceof ZodError) {
+    const simplifiedError = hanldeZodError(err);
+    (statusCode = simplifiedError?.statusCode),
+      (message = simplifiedError?.message),
+      (errorDocs = simplifiedError?.errorDocs);
+  }
+
+  return res.status(statusCode).json({
     success: false,
     message,
-    error: err,
+    errorDocs,
+    stack: config.node_env === "development" ? err?.stack : null,
   });
 };
