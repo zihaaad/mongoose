@@ -8,7 +8,6 @@ const createStudent = catchAsync(async (req, res) => {
   const result = await UserServices.createStudent(password, studentData);
 
   sendResponse(res, {
-    success: true,
     statusCode: httpStatus.OK,
     message: "Student is created sucessfully",
     data: result,
