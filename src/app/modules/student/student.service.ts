@@ -5,8 +5,31 @@ import {User} from "../user/user.model";
 import {AppError} from "../../errors/AppError";
 import httpStatus from "http-status";
 
-const getAllStudents = async () => {
-  const result = await Student.find()
+const getAllStudents = async (query: Record<string, unknown>) => {
+  console.log("base query", query);
+
+  const queryObj = {...query};
+
+  const studentSearchableFields = ["email", "name.firstName", "presentAddress"];
+
+  let searchTerm = "";
+  if (query?.searchTerm) {
+    searchTerm = query.searchTerm as string;
+  }
+
+  const searchQuery = Student.find({
+    $or: studentSearchableFields.map((field) => ({
+      [field]: {$regex: searchTerm, $options: "i"},
+    })),
+  });
+
+  // Filtering
+  const excludeFields = ["searchTerm", "sort", "limit"];
+  excludeFields.forEach((el) => delete queryObj[el]);
+  console.log(queryObj);
+
+  const filterQuery = searchQuery
+    .find(queryObj)
     .populate("admissionSemester")
     .populate({
       path: "academicDepartment",
@@ -14,7 +37,22 @@ const getAllStudents = async () => {
         path: "academicFaculty",
       },
     });
-  return result;
+
+  let sort = "-createdAt";
+  if (query?.sort) {
+    sort = query.sort as string;
+  }
+
+  const sortQuery = filterQuery.sort(sort);
+
+  let limit = 1;
+  if (query?.limit) {
+    limit = query.limit as number;
+  }
+
+  const limitQuery = await sortQuery.limit(limit);
+
+  return limitQuery;
 };
 
 const getSingleStudent = async (id: string) => {
@@ -35,7 +73,7 @@ const getSingleStudent = async (id: string) => {
 const updateStudent = async (id: string, payload: Partial<TStudent>) => {
   const {name, guardian, localGuardian, ...remainingStudentData} = payload;
 
-  const modifiedUpdatedData: Record<string> = {
+  const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingStudentData,
   };
 
