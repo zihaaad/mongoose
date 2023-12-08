@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import express, {Request, Response} from "express";
 import cors from "cors";
 import {globalErrorHandler} from "./app/middlewares/globalErrorHandler";
@@ -12,8 +14,8 @@ app.use(cors());
 // application routes
 app.use("/api/v1", router);
 
-const server = (req: Request, res: Response) => {
-  res.send("Yes ✔ Akhi - Server Active");
+const server = async (req: Request, res: Response) => {
+  res.send("🕊 SERVER ONGOING ~");
 };
 
 app.get("/", server);
