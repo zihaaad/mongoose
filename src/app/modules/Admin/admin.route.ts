@@ -6,12 +6,12 @@ import {adminControllers} from "./admin.controller";
 const router = express.Router();
 
 router.get("/", adminControllers.getAllAdmins);
-router.get("/:adminId", adminControllers.getSingleAdmin);
+router.get("/:id", adminControllers.getSingleAdmin);
 router.patch(
-  "/:adminId",
+  "/:id",
   validateRequest(updateAdminValidationSchema),
   adminControllers.updateAdmin
 );
-router.delete("/:adminId", adminControllers.deleteAdmin);
+router.delete("/:id", adminControllers.deleteAdmin);
 
 export const adminRoutes = router;

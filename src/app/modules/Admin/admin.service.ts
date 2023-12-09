@@ -21,7 +21,7 @@ const getAllAdmins = async (query: Record<string, unknown>) => {
 };
 
 const getSingleAdmin = async (id: string) => {
-  const result = await Admin.findOne({id});
+  const result = await Admin.findById(id);
   return result;
 };
 
@@ -41,7 +41,7 @@ const updateAdmin = async (id: string, payload: Partial<TAdmin>) => {
   if (!(await Admin.isUserExists(id))) {
     throw new AppError(httpStatus.NOT_FOUND, "User Doesn't Exists");
   }
-  const result = await Admin.findOneAndUpdate({id}, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
   });
   return result;
@@ -57,8 +57,8 @@ const deleteAdmin = async (id: string) => {
   try {
     session.startTransaction();
 
-    const deletedAdmin = await Admin.findOneAndUpdate(
-      {id},
+    const deletedAdmin = await Admin.findByIdAndUpdate(
+      id,
       {isDeleted: true},
       {new: true, session}
     );
@@ -67,8 +67,10 @@ const deleteAdmin = async (id: string) => {
       throw new AppError(httpStatus.BAD_GATEWAY, "Failed to Delete Admin");
     }
 
-    const deletedUser = await User.findOneAndUpdate(
-      {id},
+    const userId = deletedAdmin.user;
+
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       {isDeleted: true},
       {new: true, session}
     );
