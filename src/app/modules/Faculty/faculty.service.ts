@@ -28,6 +28,9 @@ const getAllFaculties = async (query: Record<string, unknown>) => {
 };
 
 const getSingleFaculty = async (id: string) => {
+  if (!(await Faculty.isUserExists(id))) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Doesn't Exists");
+  }
   const result = await Faculty.findOne({id}).populate({
     path: "academicDepartment",
     populate: {
@@ -38,6 +41,9 @@ const getSingleFaculty = async (id: string) => {
 };
 
 const updateFaculty = async (id: string, payload: Partial<TFaculty>) => {
+  if (!(await Faculty.isUserExists(id))) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Doesn't Exists");
+  }
   const {name, ...remainingFacultyData} = payload;
 
   const modifiedUpdatedData: Record<string, unknown> = {
@@ -69,13 +75,13 @@ const deleteFaculty = async (id: string) => {
   try {
     session.startTransaction();
 
-    const deletedStudent = await Faculty.findOneAndUpdate(
+    const deletedFaculty = await Faculty.findOneAndUpdate(
       {id},
       {isDeleted: true},
       {new: true, session}
     );
 
-    if (!deletedStudent) {
+    if (!deletedFaculty) {
       throw new AppError(httpStatus.BAD_GATEWAY, "Failed to Delete Faculty");
     }
 
@@ -92,7 +98,7 @@ const deleteFaculty = async (id: string) => {
     await session.commitTransaction();
     await session.endSession();
 
-    return deletedStudent;
+    return deleteFaculty;
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
