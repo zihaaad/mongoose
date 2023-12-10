@@ -16,6 +16,25 @@ const courseValidationSchema = z.object({
   }),
 });
 
+const updatePreRequisiteValidationCourses = z.object({
+  course: z.string().optional(),
+  isDeleted: z.boolean().default(false).optional(),
+});
+
+const updateCourseValidationSchema = z.object({
+  body: z.object({
+    title: z.string().optional(),
+    prefix: z.string().optional(),
+    code: z.number().optional(),
+    credits: z.number().optional(),
+    preRequisiteCourses: z
+      .array(updatePreRequisiteValidationCourses)
+      .optional(),
+    isDeleted: z.boolean().default(false).optional(),
+  }),
+});
+
 export const CouresValidations = {
   courseValidationSchema,
+  updateCourseValidationSchema,
 };
