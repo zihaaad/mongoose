@@ -9,10 +9,15 @@ import {adminRoutes} from "../modules/Admin/admin.route";
 import {CourseRoutes} from "../modules/Course/couse.route";
 import {SemesterRegistrationRoutes} from "../modules/semesterRegistration/semesterRegistration.route";
 import {OfferedCourseRoutes} from "../modules/OfferedCourse/OfferedCourse.route";
+import {AuthRoutes} from "../modules/Auth/auth.route";
 
 const router = Router();
 
 const moduleRoutes = [
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
   {
     path: "/users",
     route: UserRoutes,
