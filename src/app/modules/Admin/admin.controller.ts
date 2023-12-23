@@ -6,6 +6,8 @@ import {adminServices} from "./admin.service";
 const getAllAdmins = catchAsync(async (req, res) => {
   const result = await adminServices.getAllAdmins(req.query);
 
+  console.log("TEST", req.user);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: "All Admins Retrieved Successfully",
