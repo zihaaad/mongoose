@@ -100,33 +100,30 @@ const refreshToken = async (token: string) => {
 
   const {userId, iat} = decoded;
 
-  const isUserExists = await User.isUserExistsByCustomId(userId);
+  const user = await User.isUserExistsByCustomId(userId);
 
-  if (!isUserExists) {
+  if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, `${userId} User is not found`);
   }
 
-  if (isUserExists.isDeleted) {
+  if (user.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, `${userId} User is deleted!`);
   }
 
-  if (isUserExists.status === "blocked") {
+  if (user.status === "blocked") {
     throw new AppError(httpStatus.FORBIDDEN, `${userId} User is blocked!`);
   }
 
   if (
-    isUserExists.passwordChangedAt &&
-    User.isJWTIssuedBeforePasswordChanged(
-      isUserExists.passwordChangedAt,
-      iat as number
-    )
+    user.passwordChangedAt &&
+    User.isJWTIssuedBeforePasswordChanged(user.passwordChangedAt, iat as number)
   ) {
     throw new AppError(httpStatus.UNAUTHORIZED, "You are not Authorized");
   }
 
   const jwtPayload: {userId: string; role: string} = {
-    userId: isUserExists.id,
-    role: isUserExists.role,
+    userId: user.id,
+    role: user.role,
   };
 
   const accessToken = createToken(
@@ -138,8 +135,40 @@ const refreshToken = async (token: string) => {
   return {accessToken};
 };
 
+const forgetPassword = async (userId: string) => {
+  const user = await User.isUserExistsByCustomId(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, `${userId} User is not found`);
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, `${userId} User is deleted!`);
+  }
+
+  if (user.status === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, `${userId} User is blocked!`);
+  }
+
+  const jwtPayload: {userId: string; role: string} = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    "10m"
+  );
+
+  const resetUILink = `http://localhost:3000?id=${user.id}&token${accessToken}`;
+
+  return resetUILink;
+};
+
 export const AuthServices = {
   loginUser,
   refreshToken,
+  forgetPassword,
   changePassword,
 };
