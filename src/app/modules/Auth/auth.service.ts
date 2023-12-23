@@ -2,8 +2,9 @@ import httpStatus from "http-status";
 import {AppError} from "../../errors/AppError";
 import {User} from "../user/user.model";
 import {TLoginUser} from "./auth.interface";
-import jwt from "jsonwebtoken";
+import jwt, {JwtPayload} from "jsonwebtoken";
 import config from "../../config";
+import bcrypt from "bcrypt";
 
 const loginUser = async (paload: TLoginUser) => {
   const isUserExists = await User.isUserExistsByCustomId(paload.id);
@@ -41,6 +42,43 @@ const loginUser = async (paload: TLoginUser) => {
   return {accessToken, needsPasswordChange: isUserExists?.needsPasswordChange};
 };
 
+const changePassword = async (
+  userData: JwtPayload,
+  oldPassword: string,
+  newPassword: string
+) => {
+  const user = await User.isUserExistsByCustomId(userData.userId);
+
+  const isPasswordMatched = await User.isPasswordMatched(
+    oldPassword,
+    user?.password
+  );
+
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.FORBIDDEN, `Password Doesn't Match!`);
+  }
+
+  const newHashedPassword = await bcrypt.hash(
+    newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  const result = await User.findOneAndUpdate(
+    {
+      id: userData.userId,
+      role: userData.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    }
+  );
+
+  return result;
+};
+
 export const AuthServices = {
   loginUser,
+  changePassword,
 };

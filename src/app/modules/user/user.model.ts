@@ -6,11 +6,12 @@ import config from "../../config";
 const UserSchema = new Schema<TUser, UserModel>(
   {
     id: {type: String, required: true, unique: true},
-    password: {type: String, required: true},
+    password: {type: String, required: true, select: 0},
     needsPasswordChange: {
       type: Boolean,
       default: true,
     },
+    passwordChangedAt: Date,
     role: {type: String, enum: ["admin", "student", "faculty"]},
     status: {
       type: String,
@@ -39,7 +40,7 @@ UserSchema.post("save", function (doc, next) {
 });
 
 UserSchema.statics.isUserExistsByCustomId = async function (id: string) {
-  return await User.findOne({id});
+  return await User.findOne({id}).select("+password");
 };
 
 UserSchema.statics.isPasswordMatched = function (
