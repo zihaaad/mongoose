@@ -6,7 +6,7 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.get("/", auth(), adminControllers.getAllAdmins);
+router.get("/", auth("admin"), adminControllers.getAllAdmins);
 router.get("/:id", adminControllers.getSingleAdmin);
 router.patch(
   "/:id",
