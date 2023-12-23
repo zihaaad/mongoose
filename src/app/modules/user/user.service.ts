@@ -18,7 +18,7 @@ import {AcademicDepartment} from "../academicDepartment/academicDepartment.model
 import {Faculty} from "../Faculty/faculty.model";
 import {TAdmin} from "../Admin/admin.interface";
 import {Admin} from "../Admin/admin.model";
-import {verifyToken} from "../Auth/auth.utils";
+import {JwtPayload} from "jsonwebtoken";
 
 const createStudent = async (password: string, studentData: TStudent) => {
   const userData: Partial<TUser> = {};
@@ -152,10 +152,8 @@ const createAdmin = async (password: string, payload: TAdmin) => {
   }
 };
 
-const getMe = async (token: string) => {
-  const decoded = verifyToken(token, config.jwt_access_secret as string);
-
-  const {userId, role} = decoded;
+const getMe = async (payload: JwtPayload) => {
+  const {role, userId} = payload;
 
   let result = null;
 
@@ -172,9 +170,17 @@ const getMe = async (token: string) => {
   return result;
 };
 
+const changeStatus = async (id: string, payload: {status: string}) => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
 export const UserServices = {
   createStudent,
   createFaculty,
   createAdmin,
+  changeStatus,
   getMe,
 };
