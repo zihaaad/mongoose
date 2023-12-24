@@ -19,8 +19,13 @@ import {Faculty} from "../Faculty/faculty.model";
 import {TAdmin} from "../Admin/admin.interface";
 import {Admin} from "../Admin/admin.model";
 import {JwtPayload} from "jsonwebtoken";
+import {sendImageToCloudinary} from "../../utils/sendImageToCloudinary";
 
-const createStudent = async (password: string, studentData: TStudent) => {
+const createStudent = async (
+  file: any,
+  password: string,
+  studentData: TStudent
+) => {
   const userData: Partial<TUser> = {};
 
   userData.password = password || (config.default_password as string);
@@ -28,7 +33,7 @@ const createStudent = async (password: string, studentData: TStudent) => {
   userData.role = "student";
   userData.email = studentData.email;
 
-  const admissionSemester = await AcademicSemester.findById(
+  const admissionSemester: any = await AcademicSemester.findById(
     studentData.admissionSemester
   );
 
@@ -37,6 +42,11 @@ const createStudent = async (password: string, studentData: TStudent) => {
   try {
     session.startTransaction();
     userData.id = await generateStudentId(admissionSemester);
+
+    const imageName = `${userData.id}${studentData?.name?.firstName}`;
+    const path = file?.path;
+
+    const {secure_url}: any = await sendImageToCloudinary(imageName, path);
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], {session});
@@ -47,6 +57,7 @@ const createStudent = async (password: string, studentData: TStudent) => {
 
     studentData.id = newUser[0].id;
     studentData.user = newUser[0]._id; // reference _id
+    studentData.profileImg = secure_url;
 
     // create a student (transaction-2)
     const newStudent = await Student.create([studentData], {session});
