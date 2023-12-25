@@ -23,6 +23,8 @@ const createOfferedCourse = async (payload: TOfferedCourse) => {
     endTime,
   } = payload;
 
+  console.log(payload);
+
   const isSemesterRegistationExists = await SemesterRegistration.findById(
     semesterRegistration
   );

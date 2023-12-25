@@ -60,7 +60,7 @@ const moduleRoutes = [
     route: OfferedCourseRoutes,
   },
   {
-    path: "/enrolled-course",
+    path: "/enrolled-courses",
     route: EnrolledCourseRoutes,
   },
 ];
