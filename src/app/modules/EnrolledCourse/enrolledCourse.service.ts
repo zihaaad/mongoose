@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  TEnrolledCourse,
-  TEnrolledCourseMarks,
-} from "./enrolledCourse.interface";
+import {TEnrolledCourse} from "./enrolledCourse.interface";
 import {OfferedCourse} from "../OfferedCourse/OfferedCourse.model";
 import {AppError} from "../../errors/AppError";
 import httpStatus from "http-status";
