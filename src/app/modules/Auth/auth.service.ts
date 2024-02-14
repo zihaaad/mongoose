@@ -94,7 +94,7 @@ const changePassword = async (
 };
 
 const refreshToken = async (token: string) => {
-  const decoded = verifyToken(token, config.jwt_access_secret as string);
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
 
   const {userId, iat} = decoded;
 

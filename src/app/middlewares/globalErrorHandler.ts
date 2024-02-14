@@ -12,6 +12,7 @@ import {handleValidationError} from "../errors/handleValidationError";
 import {handleCastError} from "../errors/handleCastError";
 import {handleDuplicateError} from "../errors/handleDuplicateError";
 import {AppError} from "../errors/AppError";
+import {JsonWebTokenError, TokenExpiredError} from "jsonwebtoken";
 
 export const globalErrorHandler: ErrorRequestHandler = (
   err,
@@ -49,6 +50,9 @@ export const globalErrorHandler: ErrorRequestHandler = (
     (statusCode = simplifiedError?.statusCode),
       (message = simplifiedError?.message),
       (errorDocs = simplifiedError?.errorDocs);
+  } else if (err instanceof JsonWebTokenError || TokenExpiredError) {
+    statusCode = 401;
+    message = "Unauthorized Access";
   } else if (err instanceof AppError) {
     (statusCode = err?.statusCode),
       (message = err?.message),
