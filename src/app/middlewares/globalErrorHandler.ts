@@ -32,44 +32,37 @@ export const globalErrorHandler: ErrorRequestHandler = (
 
   if (err instanceof ZodError) {
     const simplifiedError = hanldeZodError(err);
-    (statusCode = simplifiedError?.statusCode),
-      (message = simplifiedError?.message),
-      (errorDocs = simplifiedError?.errorDocs);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorDocs = simplifiedError?.errorDocs;
   } else if (err?.name === "ValidationError") {
     const simplifiedError = handleValidationError(err);
-    (statusCode = simplifiedError?.statusCode),
-      (message = simplifiedError?.message),
-      (errorDocs = simplifiedError?.errorDocs);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorDocs = simplifiedError?.errorDocs;
   } else if (err?.name === "CastError") {
     const simplifiedError = handleCastError(err);
-    (statusCode = simplifiedError?.statusCode),
-      (message = simplifiedError?.message),
-      (errorDocs = simplifiedError?.errorDocs);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorDocs = simplifiedError?.errorDocs;
   } else if (err?.code === 11000) {
     const simplifiedError = handleDuplicateError(err);
-    (statusCode = simplifiedError?.statusCode),
-      (message = simplifiedError?.message),
-      (errorDocs = simplifiedError?.errorDocs);
-  } else if (err instanceof JsonWebTokenError || TokenExpiredError) {
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorDocs = simplifiedError?.errorDocs;
+  } else if (
+    err instanceof JsonWebTokenError ||
+    err instanceof TokenExpiredError
+  ) {
     statusCode = 401;
     message = "Unauthorized Access";
   } else if (err instanceof AppError) {
-    (statusCode = err?.statusCode),
-      (message = err?.message),
-      (errorDocs = [
-        {
-          path: "",
-          message: err?.message,
-        },
-      ]);
+    statusCode = err?.statusCode;
+    message = err?.message;
+    errorDocs[0].message = err.message;
   } else if (err instanceof Error) {
-    (message = err?.message),
-      (errorDocs = [
-        {
-          path: "",
-          message: err?.message,
-        },
-      ]);
+    message = err?.message;
+    errorDocs[0].message = err.message;
   }
 
   return res.status(statusCode).json({

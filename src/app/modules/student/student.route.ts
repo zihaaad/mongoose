@@ -3,13 +3,18 @@ import {StudentControllers} from "./student.controller";
 import validateRequest from "../../middlewares/validateRequest";
 import {updateStudentValidationSchema} from "./student.validation";
 import auth from "../../middlewares/auth";
+import {USER_ROLE} from "../user/user.constant";
 
 const router = express.Router();
 
-router.get("/all-students", StudentControllers.getStudents);
+router.get(
+  "/",
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  StudentControllers.getStudents
+);
 router.get(
   "/:id",
-  auth("admin", "faculty"),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
   StudentControllers.getSingleStudent
 );
 router.patch(
