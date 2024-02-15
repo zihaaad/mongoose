@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {TDays} from "./OfferedCourse.constant";
+import {Days} from "./OfferedCourse.constant";
 
 const timeStringSchema = z.string().refine(
   (time) => {
@@ -21,7 +21,7 @@ const createOfferedCourseValidationSchema = z.object({
       faculty: z.string(),
       section: z.number(),
       maxCapacity: z.number(),
-      days: z.array(z.enum([...TDays] as [string, ...string[]])),
+      days: z.array(z.enum([...Days] as [string, ...string[]])),
       startTime: timeStringSchema,
       endTime: timeStringSchema,
     })
@@ -44,7 +44,7 @@ const updateOfferedCourseValidationSchema = z.object({
       faculty: z.string(),
       section: z.number(),
       maxCapacity: z.number(),
-      days: z.array(z.enum([...TDays] as [string, ...string[]])),
+      days: z.array(z.enum([...Days] as [string, ...string[]])),
       startTime: timeStringSchema,
       endTime: timeStringSchema,
     })
