@@ -9,6 +9,7 @@ import {Faculty} from "../Faculty/faculty.model";
 import {Course} from "../Course/course.model";
 import {hasTimeConflict} from "./OfferedCourse.utilities";
 import QueryBuilder from "../../builder/QueryBuilder";
+import {Student} from "../student/student.model";
 
 const createOfferedCourse = async (payload: TOfferedCourse) => {
   const {
@@ -175,6 +176,54 @@ const getAllOfferedCourse = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await offeredCourseQuery.modelQuery;
+  const meta = await offeredCourseQuery.countTotal();
+
+  return {meta, result};
+};
+
+const getMyOfferedCourse = async (userId: string) => {
+  // find the student
+  const student = await Student.findOne({id: userId});
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, "User is not found!");
+  }
+
+  // find current ongoing semester
+  const currentOnGoingRegistrationSemester = await SemesterRegistration.findOne(
+    {
+      status: "ONGOING",
+    }
+  );
+
+  if (!currentOnGoingRegistrationSemester) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "There is no ongoing semester registration!"
+    );
+  }
+
+  const result = await OfferedCourse.aggregate([
+    {
+      $match: {
+        semesterRegistration: currentOnGoingRegistrationSemester?._id,
+        academicFaculty: student.academicFaculty,
+        academicDepartment: student.academicDepartment,
+      },
+    },
+    {
+      $lookup: {
+        from: "courses",
+        localField: "course",
+        foreignField: "_id",
+        as: "course",
+      },
+    },
+    {
+      $unwind: "$course",
+    },
+  ]);
+
   return result;
 };
 
@@ -217,4 +266,5 @@ export const OfferedCourseServices = {
   getAllOfferedCourse,
   getSingleOfferedCourse,
   deleteOfferedCourse,
+  getMyOfferedCourse,
 };

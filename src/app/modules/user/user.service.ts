@@ -50,7 +50,7 @@ const createStudent = async (
     throw new AppError(400, "Aademic department not found");
   }
 
-  studentData.academicDepartment = academicDepartment.academicFaculty;
+  studentData.academicFaculty = academicDepartment.academicFaculty;
 
   const session = await mongoose.startSession();
 
