@@ -8,7 +8,8 @@ const getStudents = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: "students is retrieved successfully",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
