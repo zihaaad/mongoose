@@ -152,6 +152,38 @@ const createEnrolledCourse = async (
   }
 };
 
+const getAllEnrolledCourses = async (
+  facultyId: string,
+  query: Record<string, unknown>
+) => {
+  const faculty = await Faculty.findOne({id: facultyId});
+
+  if (!faculty) {
+    throw new AppError(httpStatus.NOT_FOUND, "Faculty not found !");
+  }
+
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find({
+      faculty: faculty._id,
+    }).populate(
+      "semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty"
+    ),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 const getMyEnrolledCourses = async (
   studentId: string,
   query: Record<string, unknown>
@@ -270,5 +302,6 @@ const updateEnrolledCourseMarks = async (
 export const EnrolledCourseServices = {
   createEnrolledCourse,
   getMyEnrolledCourses,
+  getAllEnrolledCourses,
   updateEnrolledCourseMarks,
 };

@@ -65,7 +65,6 @@ const createStudent = async (
       const {secure_url}: any = await sendImageToCloudinary(imageName, path);
       studentData.profileImg = secure_url as string;
     }
-
     // create a user (transaction-1)
     const newUser = await User.create([userData], {session});
 

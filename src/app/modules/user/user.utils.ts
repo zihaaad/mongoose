@@ -2,7 +2,7 @@ import {TAcademicSemester} from "../academicSemester/academicSemester.interface"
 import {User} from "./user.model";
 
 const findLastStudentId = async () => {
-  const lastStudent = await User.findOne({role: "student"}, {id: 1, _id: -1})
+  const lastStudent = await User.findOne({role: "student"}, {id: 1, _id: 0})
     .sort({createdAt: -1})
     .lean();
   return lastStudent?.id ? lastStudent.id : undefined;
@@ -16,7 +16,6 @@ export const generateStudentId = async (payload: TAcademicSemester) => {
   const lastStudentYear = lastStudentId?.substring(0, 4);
   const currentSemesterCode = payload.code;
   const currentSemesterYear = payload.year;
-
   if (
     lastStudentId &&
     lastStudentSemesterCode === currentSemesterCode &&

@@ -14,7 +14,11 @@ router.post(
   academicFacultyControllers.createAcademicFaculty
 );
 
-router.get("/", auth(), academicFacultyControllers.getAllAcademicFaculies);
+router.get(
+  "/",
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+  academicFacultyControllers.getAllAcademicFaculies
+);
 router.get("/:facultyId", academicFacultyControllers.getSingleAcademicFaculty);
 router.patch(
   "/:facultyId",
